@@ -1,0 +1,64 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+model CartItem {
+  id        String    @id @default(uuid())
+  userId    String
+  productId String
+  type      String    // "sale" | "rent"
+  quantity  Int       @default(1)
+  rentStart DateTime? // Required if type is "rent"
+  rentEnd   DateTime? // Required if type is "rent"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, productId, type, rentStart, rentEnd])
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  orderType       String      // "sale" | "rent" | "custom" | "mixed"
+  paymentId       String?     // Associated payment tx record ID
+  deliveryAddress Json        // Holds complete address snapshot
+  status          String      @default("pending") // "pending", "paid", "fulfilled", "completed", "cancelled"
+  deposit         Float       @default(0.0) // Total rental deposit held
+  customRequestId String?     // ID if converted from customRequest
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id           String    @id @default(uuid())
+  orderId      String
+  order        Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  type         String    // "sale" | "rent"
+  price        Float     // Unit price at the time of purchase/rent
+  quantity     Int       @default(1)
+  rentStart    DateTime?
+  rentEnd      DateTime?
+  returnStatus String?   // "not_returned" | "returned_ok" | "returned_damaged" (only for "rent")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model RentalCalendar {
+  id          String   @id @default(uuid())
+  productId   String
+  orderItemId String?  // Reference to reservation item
+  rentStart   DateTime
+  rentEnd     DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@index([rentStart, rentEnd])
+}

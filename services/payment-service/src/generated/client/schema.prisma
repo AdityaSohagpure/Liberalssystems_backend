@@ -1,0 +1,20 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+model Payment {
+  id         String   @id @default(uuid())
+  orderId    String
+  amount     Float
+  type       String // "payment" | "deposit" | "refund"
+  gatewayRef String // Reference from Stripe/Razorpay
+  status     String // "pending" | "success" | "failed"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

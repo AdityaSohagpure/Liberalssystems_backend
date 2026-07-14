@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+model Product {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  images      Json   @default("[]") // Array of image URLs
+  category    String
+  listingType String // "sale" | "rent" | "both"
+
+  // Sale fields
+  salePrice Float?
+  saleStock Int?
+
+  // Rent fields
+  rentPricePerDay  Float?
+  rentPricePerWeek Float?
+  rentDeposit      Float?
+
+  isCustomizable Boolean  @default(false)
+  createdBy      String // ID of vendor/admin
+  status         String   @default("active") // "active", "draft", "archived"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

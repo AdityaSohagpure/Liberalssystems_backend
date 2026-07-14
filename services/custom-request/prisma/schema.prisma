@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+model CustomRequest {
+  id              String   @id @default(uuid())
+  userId          String
+  productCategory String
+  description     String
+  referenceImages Json     @default("[]") // Array of image URLs
+  budgetRange     String
+  status          String   @default("pending") // "pending" | "quoted" | "approved" | "rejected" | "converted"
+  
+  // Admin Quote fields (nullable until quoted)
+  adminQuotePrice Float?
+  adminQuoteEta   String?
+  adminQuoteNotes String?
+
+  convertedOrderId String? // Set after status becomes "converted"
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
