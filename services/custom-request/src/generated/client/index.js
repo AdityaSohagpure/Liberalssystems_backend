@@ -147,7 +147,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\wp\\project\\librals\\backend\\services\\custom-request\\src\\generated\\client",
+      "value": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\custom-request\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -161,12 +161,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\wp\\project\\librals\\backend\\services\\custom-request\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\custom-request\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",

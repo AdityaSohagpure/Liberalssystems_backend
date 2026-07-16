@@ -129,6 +129,7 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   phone: 'phone',
   role: 'role',
+  isActive: 'isActive',
   wishlist: 'wishlist',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -153,11 +154,6 @@ exports.Prisma.SortOrder = {
 
 exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
-};
-
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
 };
 
 exports.Prisma.JsonNullValueFilter = {
