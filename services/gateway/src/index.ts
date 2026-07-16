@@ -56,7 +56,14 @@ app.use('/api/users', createProxyMiddleware(createProxyOpts(services.user)));
 app.use('/api/products', createProxyMiddleware(createProxyOpts(services.catalog)));
 app.use('/api/orders', createProxyMiddleware(createProxyOpts(services.order)));
 app.use('/api/payments', createProxyMiddleware(createProxyOpts(services.payment)));
-app.use('/api/custom-requests', createProxyMiddleware(createProxyOpts(services.customRequest)));
+app.use('/api/admin/custom-requests', createProxyMiddleware({
+  ...createProxyOpts(services.customRequest),
+  pathRewrite: (path) => `/api/admin/custom-requests${path}`
+}));
+app.use('/api/custom-requests', createProxyMiddleware({
+  ...createProxyOpts(services.customRequest),
+  pathRewrite: (path) => `/api/custom-requests${path}`
+}));
 
 // Fallback route
 app.use((req, res) => {

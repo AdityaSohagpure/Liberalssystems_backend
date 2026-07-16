@@ -17,13 +17,13 @@ app.use(morgan('dev'));
 
 const orderServiceUrl = process.env.ORDER_SERVICE_URL || 'http://localhost:5003';
 
-// Create a Custom Product Request (User)
-app.post('/custom-requests', async (req, res) => {
+// 1. Submit a new custom request
+app.post('/api/custom-requests', async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
   const { productCategory, description, budgetRange, referenceImages } = req.body;
 
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
   }
 
   if (!productCategory || !description || !budgetRange) {
@@ -49,27 +49,19 @@ app.post('/custom-requests', async (req, res) => {
   }
 });
 
-// GET Custom Requests (Admin gets all, Customer gets their own)
-app.get('/custom-requests', async (req, res) => {
+// 2. List current user's requests
+app.get('/api/custom-requests', async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
-  const userRole = req.headers['x-user-role'] as string;
 
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
   }
 
   try {
-    let requests;
-    if (userRole === 'admin') {
-      requests = await prisma.customRequest.findMany({
-        orderBy: { createdAt: 'desc' },
-      });
-    } else {
-      requests = await prisma.customRequest.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-      });
-    }
+    const requests = await prisma.customRequest.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
 
     res.json(requests);
   } catch (error) {
@@ -78,14 +70,40 @@ app.get('/custom-requests', async (req, res) => {
   }
 });
 
-// GET Single Custom Request
-app.get('/custom-requests/:id', async (req, res) => {
+// 3. Get admin queue of pending requests (Admin only)
+app.get('/api/admin/custom-requests', async (req, res) => {
+  const userId = req.headers['x-user-id'] as string;
+  const userRole = req.headers['x-user-role'] as string;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
+  }
+
+  if (userRole !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden: Admin role required' });
+  }
+
+  try {
+    const requests = await prisma.customRequest.findMany({
+      where: { status: 'pending' },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.json(requests);
+  } catch (error) {
+    console.error('Error fetching admin custom requests:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 4. Get request detail
+app.get('/api/custom-requests/:id', async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
   const userRole = req.headers['x-user-role'] as string;
   const { id } = req.params;
 
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
   }
 
   try {
@@ -98,21 +116,26 @@ app.get('/custom-requests/:id', async (req, res) => {
     }
 
     if (request.userId !== userId && userRole !== 'admin') {
-      return res.status(403).json({ error: 'Forbidden' });
+      return res.status(403).json({ error: 'Forbidden: Access denied' });
     }
 
     res.json(request);
   } catch (error) {
-    console.error('Error fetching custom request:', error);
+    console.error('Error fetching custom request details:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Quote a Custom Request (Admin only)
-app.post('/custom-requests/:id/quote', async (req, res) => {
+// 5. Admin submits a quote
+app.patch('/api/custom-requests/:id/quote', async (req, res) => {
+  const userId = req.headers['x-user-id'] as string;
   const userRole = req.headers['x-user-role'] as string;
   const { id } = req.params;
   const { price, eta, notes } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
+  }
 
   if (userRole !== 'admin' && userRole !== 'vendor') {
     return res.status(403).json({ error: 'Forbidden: Admin or Vendor role required' });
@@ -152,14 +175,14 @@ app.post('/custom-requests/:id/quote', async (req, res) => {
   }
 });
 
-// Respond to Quote (User accepts/rejects)
-app.post('/custom-requests/:id/respond', async (req, res) => {
+// 6. Customer responds to quote (accept/reject)
+app.patch('/api/custom-requests/:id/respond', async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
   const { id } = req.params;
-  const { response } = req.body; // "accept" | "reject"
+  const { response, deliveryAddress } = req.body; // response: "accept" | "reject"
 
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
   }
 
   if (!response || !['accept', 'reject'].includes(response)) {
@@ -171,58 +194,40 @@ app.post('/custom-requests/:id/respond', async (req, res) => {
       where: { id },
     });
 
-    if (!request || request.userId !== userId) {
+    if (!request) {
       return res.status(404).json({ error: 'Custom request not found' });
+    }
+
+    if (request.userId !== userId) {
+      return res.status(403).json({ error: 'Forbidden: You do not own this request' });
     }
 
     if (request.status !== 'quoted') {
-      return res.status(400).json({ error: 'Custom request has not been quoted yet' });
+      return res.status(400).json({ error: `Custom request status must be quoted, current is: ${request.status}` });
     }
 
-    const newStatus = response === 'accept' ? 'approved' : 'rejected';
-
-    const updatedRequest = await prisma.customRequest.update({
-      where: { id },
-      data: { status: newStatus },
-    });
-
-    res.json(updatedRequest);
-  } catch (error) {
-    console.error('Error responding to quote:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Convert Custom Request to Order (User accepts & creates order)
-app.post('/custom-requests/:id/convert', async (req, res) => {
-  const userId = req.headers['x-user-id'] as string;
-  const { id } = req.params;
-  const { deliveryAddress } = req.body;
-
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  if (!deliveryAddress) {
-    return res.status(400).json({ error: 'deliveryAddress is required' });
-  }
-
-  try {
-    const request = await prisma.customRequest.findUnique({
-      where: { id },
-    });
-
-    if (!request || request.userId !== userId) {
-      return res.status(404).json({ error: 'Custom request not found' });
+    if (response === 'reject') {
+      const updatedRequest = await prisma.customRequest.update({
+        where: { id },
+        data: { status: 'rejected' },
+      });
+      return res.json(updatedRequest);
     }
 
-    if (request.status !== 'approved') {
-      return res.status(400).json({ error: 'Custom request must be approved first before converting' });
+    // response === 'accept'
+    if (!deliveryAddress) {
+      return res.status(400).json({ error: 'deliveryAddress is required to accept the quote' });
     }
 
     if (!request.adminQuotePrice) {
       return res.status(400).json({ error: 'Approved quote lacks pricing details' });
     }
+
+    // Set state to approved first
+    await prisma.customRequest.update({
+      where: { id },
+      data: { status: 'approved' },
+    });
 
     // Call Order Service to create custom order
     let orderResponse;
@@ -239,12 +244,16 @@ app.post('/custom-requests/:id/convert', async (req, res) => {
       });
     } catch (err: any) {
       console.error('Failed to create order in Order Service:', err.response?.data || err.message);
-      return res.status(500).json({ error: 'Failed to create converted order in Order Service' });
+      // Revert status to approved/quoted or return error
+      return res.status(500).json({ 
+        error: 'Failed to create converted order in Order Service',
+        details: err.response?.data || err.message
+      });
     }
 
     const { order } = orderResponse.data;
 
-    // Update custom request status to converted and log order ID
+    // Update status to converted and record the convertedOrderId
     const updatedRequest = await prisma.customRequest.update({
       where: { id },
       data: {
@@ -254,12 +263,12 @@ app.post('/custom-requests/:id/convert', async (req, res) => {
     });
 
     res.json({
-      message: 'Custom request converted to order successfully',
+      message: 'Custom request approved and converted to order successfully',
       customRequest: updatedRequest,
       order,
     });
   } catch (error) {
-    console.error('Error converting custom request to order:', error);
+    console.error('Error responding to quote:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
