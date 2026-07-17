@@ -89,7 +89,7 @@ app.get('/orders/cart', async (req, res) => {
 });
 
 // POST Add item to Cart
-app.post('/orders/cart', async (req, res) => {
+app.post(['/orders/cart', '/orders/cart/items'], async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
   const { productId, type, quantity, rentStart, rentEnd } = req.body;
 
@@ -182,7 +182,7 @@ app.post('/orders/cart', async (req, res) => {
 });
 
 // DELETE Cart item
-app.delete('/orders/cart/:id', async (req, res) => {
+app.delete(['/orders/cart/:id', '/orders/cart/items/:id'], async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
   const { id } = req.params;
 
@@ -439,7 +439,7 @@ app.post('/orders/:id/payment-complete', async (req, res) => {
 });
 
 // Create Custom Order (Converted from Custom Request)
-app.post('/orders/custom', async (req, res) => {
+app.post(['/orders/custom', '/internal/orders/from-custom-request'], async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
   const { customRequestId, quotePrice, deliveryAddress, productCategory } = req.body;
 
@@ -588,6 +588,279 @@ app.put('/orders/items/:itemId/return', async (req, res) => {
     res.json(updatedItem);
   } catch (error) {
     console.error('Error updating rental return status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT Update Cart Item quantity or dates
+app.put('/orders/cart/items/:id', async (req, res) => {
+  const userId = req.headers['x-user-id'] as string;
+  const { id } = req.params;
+  const { quantity, rentStart, rentEnd } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const cartItem = await prisma.cartItem.findUnique({
+      where: { id },
+    });
+
+    if (!cartItem || cartItem.userId !== userId) {
+      return res.status(404).json({ error: 'Cart item not found' });
+    }
+
+    const updateData: any = {};
+    if (quantity !== undefined) {
+      updateData.quantity = parseInt(quantity);
+    }
+
+    if (cartItem.type === 'rent') {
+      if (rentStart || rentEnd) {
+        const start = new Date(rentStart || cartItem.rentStart!);
+        const end = new Date(rentEnd || cartItem.rentEnd!);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime()) || start >= end) {
+          return res.status(400).json({ error: 'Invalid rental date ranges' });
+        }
+
+        // Check availability
+        const isBooked = await checkOverlap(cartItem.productId, start, end);
+        if (isBooked) {
+          return res.status(400).json({ error: 'Product is already rented/booked for these dates' });
+        }
+
+        updateData.rentStart = start;
+        updateData.rentEnd = end;
+      }
+    }
+
+    const updatedItem = await prisma.cartItem.update({
+      where: { id },
+      data: updateData,
+    });
+
+    res.json(updatedItem);
+  } catch (error) {
+    console.error('Error updating cart item:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST Add item to Cart from Wishlist (Like to Cart)
+app.post(['/orders/cart/from-wishlist', '/orders/cart/items/from-wishlist'], async (req, res) => {
+  const userId = req.headers['x-user-id'] as string;
+  const { productId, type, quantity, rentStart, rentEnd } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized: User ID missing' });
+  }
+
+  if (!productId) {
+    return res.status(400).json({ error: 'productId is required' });
+  }
+
+  try {
+    // 1. Fetch user's wishlist from User Service
+    const userServiceUrl = process.env.USER_SERVICE_URL || 'http://localhost:5001';
+    let wishlist: string[] = [];
+    try {
+      const response = await axios.get(`${userServiceUrl}/users/wishlist`, {
+        headers: { 'x-user-id': userId }
+      });
+      wishlist = response.data;
+    } catch (err: any) {
+      return res.status(500).json({ error: 'Failed to fetch user wishlist from User Service' });
+    }
+
+    // 2. Verify product is in user's wishlist
+    if (!wishlist.includes(productId)) {
+      return res.status(400).json({ error: 'Product is not in your wishlist' });
+    }
+
+    // 3. Fetch product details from Catalog Service
+    let productDetails;
+    try {
+      const response = await axios.get(`${catalogServiceUrl}/products/${productId}`);
+      productDetails = response.data;
+    } catch (err: any) {
+      return res.status(404).json({ error: 'Product not found in catalog' });
+    }
+
+    // 4. Determine listing type to add to cart
+    const finalType = type || (productDetails.listingType === 'rent' ? 'rent' : 'sale');
+
+    if (finalType !== 'sale' && finalType !== 'rent') {
+      return res.status(400).json({ error: 'Invalid item type' });
+    }
+
+    if (productDetails.listingType !== finalType && productDetails.listingType !== 'both') {
+      return res.status(400).json({ error: `Product is not listed for ${finalType}` });
+    }
+
+    let parsedStart: Date | null = null;
+    let parsedEnd: Date | null = null;
+
+    if (finalType === 'rent') {
+      if (!rentStart || !rentEnd) {
+        return res.status(400).json({ error: 'rentStart and rentEnd are required to add rental item from wishlist' });
+      }
+
+      parsedStart = new Date(rentStart);
+      parsedEnd = new Date(rentEnd);
+
+      if (isNaN(parsedStart.getTime()) || isNaN(parsedEnd.getTime()) || parsedStart >= parsedEnd) {
+        return res.status(400).json({ error: 'Invalid rental date ranges' });
+      }
+
+      // Check dates availability
+      const isBooked = await checkOverlap(productId, parsedStart, parsedEnd);
+      if (isBooked) {
+        return res.status(400).json({ error: 'Product is already rented/booked for these dates' });
+      }
+    }
+
+    const qty = quantity ? parseInt(quantity) : 1;
+
+    // 5. Save to Cart
+    const existingCartItem = await prisma.cartItem.findFirst({
+      where: {
+        userId,
+        productId,
+        type: finalType,
+        rentStart: parsedStart,
+        rentEnd: parsedEnd,
+      },
+    });
+
+    let cartItem;
+    if (existingCartItem) {
+      cartItem = await prisma.cartItem.update({
+        where: { id: existingCartItem.id },
+        data: { quantity: existingCartItem.quantity + qty },
+      });
+    } else {
+      cartItem = await prisma.cartItem.create({
+        data: {
+          userId,
+          productId,
+          type: finalType,
+          quantity: qty,
+          rentStart: parsedStart,
+          rentEnd: parsedEnd,
+        },
+      });
+    }
+
+    // 6. Toggle wishlist to remove the item after adding it to the cart
+    try {
+      await axios.post(`${userServiceUrl}/users/wishlist`, { productId }, {
+        headers: { 'x-user-id': userId }
+      });
+    } catch (err: any) {
+      console.warn('Failed to remove item from wishlist after adding to cart:', err.message);
+    }
+
+    res.status(201).json({
+      message: 'Item successfully moved from wishlist to cart',
+      cartItem
+    });
+  } catch (error) {
+    console.error('Error adding from wishlist to cart:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH Update Order Status (Admin/Vendor only)
+app.patch('/orders/:id/status', async (req, res) => {
+  const userRole = req.headers['x-user-role'] as string;
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (userRole !== 'admin' && userRole !== 'vendor') {
+    return res.status(403).json({ error: 'Forbidden: Vendor or Admin role required' });
+  }
+
+  if (!status) {
+    return res.status(400).json({ error: 'status is required' });
+  }
+
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id },
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id },
+      data: { status },
+    });
+
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH Update Rental Return Status (Admin/Vendor only)
+app.patch('/orders/:id/items/:itemId/return', async (req, res) => {
+  const userRole = req.headers['x-user-role'] as string;
+  const { itemId } = req.params;
+  const { returnStatus } = req.body; // "returned_ok" | "returned_damaged" | "not_returned"
+
+  if (userRole !== 'admin' && userRole !== 'vendor') {
+    return res.status(403).json({ error: 'Forbidden: Admin or Vendor credentials required' });
+  }
+
+  if (!['returned_ok', 'returned_damaged', 'not_returned'].includes(returnStatus)) {
+    return res.status(400).json({ error: 'Invalid return status value' });
+  }
+
+  try {
+    const orderItem = await prisma.orderItem.findUnique({
+      where: { id: itemId },
+    });
+
+    if (!orderItem || orderItem.type !== 'rent') {
+      return res.status(404).json({ error: 'Rental order item not found' });
+    }
+
+    const updatedItem = await prisma.orderItem.update({
+      where: { id: itemId },
+      data: { returnStatus },
+    });
+
+    // If item is returned, we can release it in the RentalCalendar
+    if (returnStatus === 'returned_ok' || returnStatus === 'returned_damaged') {
+      await prisma.rentalCalendar.deleteMany({
+        where: { orderItemId: itemId },
+      });
+    }
+
+    res.json(updatedItem);
+  } catch (error) {
+    console.error('Error updating rental return status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET Product Availability (Public) - blocked rental date ranges
+app.get('/orders/products/:id/availability', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const calendar = await prisma.rentalCalendar.findMany({
+      where: { productId: id },
+      select: { rentStart: true, rentEnd: true },
+      orderBy: { rentStart: 'asc' },
+    });
+    res.json(calendar);
+  } catch (error) {
+    console.error('Error fetching availability:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

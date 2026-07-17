@@ -147,11 +147,6 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
@@ -181,7 +176,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\wp\\project\\librals\\backend\\services\\order-service\\src\\generated\\client",
+      "value": "D:\\Liberal\\services\\order-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -195,11 +190,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\wp\\project\\librals\\backend\\services\\order-service\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Liberal\\services\\order-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -208,8 +203,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
-  "postinstall": false,
+  "activeProvider": "mysql",
   "inlineDatasources": {
     "db": {
       "url": {
@@ -218,8 +212,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel CartItem {\n  id        String    @id @default(uuid())\n  userId    String\n  productId String\n  type      String // \"sale\" | \"rent\"\n  quantity  Int       @default(1)\n  rentStart DateTime? // Required if type is \"rent\"\n  rentEnd   DateTime? // Required if type is \"rent\"\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n\n  @@unique([userId, productId, type, rentStart, rentEnd])\n}\n\nmodel Order {\n  id              String      @id @default(uuid())\n  userId          String\n  orderType       String // \"sale\" | \"rent\" | \"custom\" | \"mixed\"\n  paymentId       String? // Associated payment tx record ID\n  deliveryAddress Json // Holds complete address snapshot\n  status          String      @default(\"pending\") // \"pending\", \"paid\", \"fulfilled\", \"completed\", \"cancelled\"\n  deposit         Float       @default(0.0) // Total rental deposit held\n  customRequestId String? // ID if converted from customRequest\n  items           OrderItem[]\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt\n}\n\nmodel OrderItem {\n  id           String    @id @default(uuid())\n  orderId      String\n  order        Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)\n  productId    String\n  type         String // \"sale\" | \"rent\"\n  price        Float // Unit price at the time of purchase/rent\n  quantity     Int       @default(1)\n  rentStart    DateTime?\n  rentEnd      DateTime?\n  returnStatus String? // \"not_returned\" | \"returned_ok\" | \"returned_damaged\" (only for \"rent\")\n  createdAt    DateTime  @default(now())\n  updatedAt    DateTime  @updatedAt\n}\n\nmodel RentalCalendar {\n  id          String   @id @default(uuid())\n  productId   String\n  orderItemId String? // Reference to reservation item\n  rentStart   DateTime\n  rentEnd     DateTime\n  createdAt   DateTime @default(now())\n\n  @@index([productId])\n  @@index([rentStart, rentEnd])\n}\n",
-  "inlineSchemaHash": "51bce8617ddebeb40d7c6d7f38c1408f261d4b7e24ae0bb731badd2de787da65",
+  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel CartItem {\n  id        String    @id @default(uuid())\n  userId    String\n  productId String\n  type      String // \"sale\" | \"rent\"\n  quantity  Int       @default(1)\n  rentStart DateTime? // Required if type is \"rent\"\n  rentEnd   DateTime? // Required if type is \"rent\"\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n\n  @@unique([userId, productId, type, rentStart, rentEnd])\n}\n\nmodel Order {\n  id              String      @id @default(uuid())\n  userId          String\n  orderType       String // \"sale\" | \"rent\" | \"custom\" | \"mixed\"\n  paymentId       String? // Associated payment tx record ID\n  deliveryAddress Json // Holds complete address snapshot\n  status          String      @default(\"pending\") // \"pending\", \"paid\", \"fulfilled\", \"completed\", \"cancelled\"\n  deposit         Float       @default(0.0) // Total rental deposit held\n  customRequestId String? // ID if converted from customRequest\n  items           OrderItem[]\n  createdAt       DateTime    @default(now())\n  updatedAt       DateTime    @updatedAt\n}\n\nmodel OrderItem {\n  id           String    @id @default(uuid())\n  orderId      String\n  order        Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)\n  productId    String\n  type         String // \"sale\" | \"rent\"\n  price        Float // Unit price at the time of purchase/rent\n  quantity     Int       @default(1)\n  rentStart    DateTime?\n  rentEnd      DateTime?\n  returnStatus String? // \"not_returned\" | \"returned_ok\" | \"returned_damaged\" (only for \"rent\")\n  createdAt    DateTime  @default(now())\n  updatedAt    DateTime  @updatedAt\n}\n\nmodel RentalCalendar {\n  id          String   @id @default(uuid())\n  productId   String\n  orderItemId String? // Reference to reservation item\n  rentStart   DateTime\n  rentEnd     DateTime\n  createdAt   DateTime @default(now())\n\n  @@index([productId])\n  @@index([rentStart, rentEnd])\n}\n",
+  "inlineSchemaHash": "ec44830e1b34f271cd5a07912d951d4616be0aa6f93976184ad7ac52f4b1aa51",
   "copyEngine": true
 }
 config.dirname = '/'

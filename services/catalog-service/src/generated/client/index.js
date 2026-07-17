@@ -119,11 +119,6 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
@@ -150,7 +145,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\wp\\project\\librals\\backend\\services\\catalog-service\\src\\generated\\client",
+      "value": "D:\\Liberal\\services\\catalog-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -164,11 +159,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\wp\\project\\librals\\backend\\services\\catalog-service\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Liberal\\services\\catalog-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -177,8 +172,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
-  "postinstall": false,
+  "activeProvider": "mysql",
   "inlineDatasources": {
     "db": {
       "url": {
@@ -187,8 +181,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel Product {\n  id          String @id @default(uuid())\n  name        String\n  description String\n  images      Json   @default(\"[]\") // Array of image URLs\n  category    String\n  listingType String // \"sale\" | \"rent\" | \"both\"\n\n  // Sale fields\n  salePrice Float?\n  saleStock Int?\n\n  // Rent fields\n  rentPricePerDay  Float?\n  rentPricePerWeek Float?\n  rentDeposit      Float?\n\n  isCustomizable Boolean  @default(false)\n  createdBy      String // ID of vendor/admin\n  status         String   @default(\"active\") // \"active\", \"draft\", \"archived\"\n  createdAt      DateTime @default(now())\n  updatedAt      DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "b432003cd645802e761a626b07da1326b7a8c7677b2c026a380ffc1ea3cf5a6b",
+  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel Product {\n  id          String @id @default(uuid())\n  name        String\n  description String\n  images      Json   @default(\"[]\") // Array of image URLs\n  category    String\n  listingType String // \"sale\" | \"rent\" | \"both\"\n\n  // Sale fields\n  salePrice Float?\n  saleStock Int?\n\n  // Rent fields\n  rentPricePerDay  Float?\n  rentPricePerWeek Float?\n  rentDeposit      Float?\n\n  isCustomizable Boolean  @default(false)\n  createdBy      String // ID of vendor/admin\n  status         String   @default(\"active\") // \"active\", \"draft\", \"archived\"\n  createdAt      DateTime @default(now())\n  updatedAt      DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "dd2cdeffb026d2e22256f095747f2bd2fd3fea6b4c36164ffafe4ed6e2038194",
   "copyEngine": true
 }
 
