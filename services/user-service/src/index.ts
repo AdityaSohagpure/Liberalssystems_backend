@@ -564,6 +564,7 @@ apiRouter.patch('/:id/role', async (req, res) => {
 });
 
 app.use('/api/users', apiRouter);
+app.use('/', apiRouter);
 
 app.listen(PORT, () => {
   console.log(`User Service running on port ${PORT}`);
