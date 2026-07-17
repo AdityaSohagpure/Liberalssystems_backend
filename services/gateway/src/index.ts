@@ -77,16 +77,12 @@ app.use(createProxyMiddleware({
 }));
 
 // Route mapping
-app.use('/api/users', createProxyMiddleware(createProxyOpts(services.user)));
-app.use('/api/products', createProxyMiddleware(createProxyOpts(services.catalog)));
-app.use('/api/orders', createProxyMiddleware(createProxyOpts(services.order)));
-app.use('/api/payments', createProxyMiddleware(createProxyOpts(services.payment)));
 app.use('/api/admin/custom-requests', createProxyMiddleware({
-  ...createProxyOpts(services.customRequest),
+  ...createProxyOpts(services.customRequest, ''),
   pathRewrite: (path) => `/api/admin/custom-requests${path}`
 }));
 app.use('/api/custom-requests', createProxyMiddleware({
-  ...createProxyOpts(services.customRequest),
+  ...createProxyOpts(services.customRequest, ''),
   pathRewrite: (path) => `/api/custom-requests${path}`
 }));
 app.use('/api/users', createProxyMiddleware(createProxyOpts(services.user, '/users')));

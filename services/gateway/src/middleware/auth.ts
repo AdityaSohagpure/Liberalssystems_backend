@@ -52,16 +52,26 @@ export async function authenticateToken(req: AuthenticatedRequest, res: Response
 
   // Support mock-token for local testing/development when Firebase is not configured
   if (token === 'mock-token') {
-    const mockUser = {
-      id: 'mock-uuid-12345',
-      firebaseUid: 'mock-firebase-uid',
-      email: 'mockuser@example.com',
-      role: 'customer',
-    };
-    req.headers['x-user-id'] = mockUser.id;
-    req.headers['x-user-role'] = mockUser.role;
-    req.headers['x-user-firebase-uid'] = mockUser.firebaseUid;
-    return next();
+    try {
+      const response = await axios.post(`${userServiceUrl}/users/sync`, {
+        firebaseUid: 'mock-firebase-uid',
+        email: 'mockuser@example.com',
+        name: 'Mock User',
+        phone: '12345678',
+      });
+      const { id, role } = response.data;
+      req.headers['x-user-id'] = id;
+      req.headers['x-user-role'] = role;
+      req.headers['x-user-firebase-uid'] = 'mock-firebase-uid';
+      return next();
+    } catch (syncError: any) {
+      console.error('Failed to sync mock user with User Service:', syncError.message);
+      // Fallback to static mock headers if user service is down or database is resetting
+      req.headers['x-user-id'] = 'mock-uuid-12345';
+      req.headers['x-user-role'] = 'customer';
+      req.headers['x-user-firebase-uid'] = 'mock-firebase-uid';
+      return next();
+    }
   }
 
   try {
