@@ -14,9 +14,8 @@ model User {
   name        String
   email       String
   phone       String?
-  role        String    @default("customer")
-  isActive    Boolean   @default(true)
-  wishlist    Json      // Stored as JSON array of product IDs
+  role        String    @default("customer") // "customer", "admin", "vendor"
+  wishlist    Json      @default("[]") // JSON array of product IDs
   addresses   Address[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

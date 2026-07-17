@@ -121,7 +121,6 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\payment-service\\src\\generated\\client",
       "value": "D:\\Liberal\\services\\payment-service\\src\\generated\\client",
       "fromEnvVar": null
     },
@@ -136,11 +135,6 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\payment-service\\prisma\\schema.prisma",
-    "isCustomOutput": true
-  },
-  "relativeEnvPaths": {
-    "rootEnvPath": null
     "sourceFilePath": "D:\\Liberal\\services\\payment-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
