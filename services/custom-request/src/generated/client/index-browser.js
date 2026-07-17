@@ -157,7 +157,13 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.RequestStatus = exports.$Enums.RequestStatus = {
+  pending: 'pending',
+  quoted: 'quoted',
+  approved: 'approved',
+  rejected: 'rejected',
+  converted: 'converted'
+};
 
 exports.Prisma.ModelName = {
   CustomRequest: 'CustomRequest'

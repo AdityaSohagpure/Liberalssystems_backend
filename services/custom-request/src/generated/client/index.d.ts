@@ -20,6 +20,26 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 export type CustomRequest = $Result.DefaultSelection<Prisma.$CustomRequestPayload>
 
 /**
+ * Enums
+ */
+export namespace $Enums {
+  export const RequestStatus: {
+  pending: 'pending',
+  quoted: 'quoted',
+  approved: 'approved',
+  rejected: 'rejected',
+  converted: 'converted'
+};
+
+export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]
+
+}
+
+export type RequestStatus = $Enums.RequestStatus
+
+export const RequestStatus: typeof $Enums.RequestStatus
+
+/**
  * ##  Prisma Client ʲˢ
  * 
  * Type-safe database client for TypeScript & Node.js
@@ -865,7 +885,7 @@ export namespace Prisma {
     productCategory: string | null
     description: string | null
     budgetRange: string | null
-    status: string | null
+    status: $Enums.RequestStatus | null
     adminQuotePrice: number | null
     adminQuoteEta: string | null
     adminQuoteNotes: string | null
@@ -880,7 +900,7 @@ export namespace Prisma {
     productCategory: string | null
     description: string | null
     budgetRange: string | null
-    status: string | null
+    status: $Enums.RequestStatus | null
     adminQuotePrice: number | null
     adminQuoteEta: string | null
     adminQuoteNotes: string | null
@@ -1055,7 +1075,7 @@ export namespace Prisma {
     description: string
     referenceImages: JsonValue
     budgetRange: string
-    status: string
+    status: $Enums.RequestStatus
     adminQuotePrice: number | null
     adminQuoteEta: string | null
     adminQuoteNotes: string | null
@@ -1127,7 +1147,7 @@ export namespace Prisma {
       description: string
       referenceImages: Prisma.JsonValue
       budgetRange: string
-      status: string
+      status: $Enums.RequestStatus
       adminQuotePrice: number | null
       adminQuoteEta: string | null
       adminQuoteNotes: string | null
@@ -1509,7 +1529,7 @@ export namespace Prisma {
     readonly description: FieldRef<"CustomRequest", 'String'>
     readonly referenceImages: FieldRef<"CustomRequest", 'Json'>
     readonly budgetRange: FieldRef<"CustomRequest", 'String'>
-    readonly status: FieldRef<"CustomRequest", 'String'>
+    readonly status: FieldRef<"CustomRequest", 'RequestStatus'>
     readonly adminQuotePrice: FieldRef<"CustomRequest", 'Float'>
     readonly adminQuoteEta: FieldRef<"CustomRequest", 'String'>
     readonly adminQuoteNotes: FieldRef<"CustomRequest", 'String'>
@@ -1874,6 +1894,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'RequestStatus'
+   */
+  export type EnumRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RequestStatus'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1907,7 +1934,7 @@ export namespace Prisma {
     description?: StringFilter<"CustomRequest"> | string
     referenceImages?: JsonFilter<"CustomRequest">
     budgetRange?: StringFilter<"CustomRequest"> | string
-    status?: StringFilter<"CustomRequest"> | string
+    status?: EnumRequestStatusFilter<"CustomRequest"> | $Enums.RequestStatus
     adminQuotePrice?: FloatNullableFilter<"CustomRequest"> | number | null
     adminQuoteEta?: StringNullableFilter<"CustomRequest"> | string | null
     adminQuoteNotes?: StringNullableFilter<"CustomRequest"> | string | null
@@ -1942,7 +1969,7 @@ export namespace Prisma {
     description?: StringFilter<"CustomRequest"> | string
     referenceImages?: JsonFilter<"CustomRequest">
     budgetRange?: StringFilter<"CustomRequest"> | string
-    status?: StringFilter<"CustomRequest"> | string
+    status?: EnumRequestStatusFilter<"CustomRequest"> | $Enums.RequestStatus
     adminQuotePrice?: FloatNullableFilter<"CustomRequest"> | number | null
     adminQuoteEta?: StringNullableFilter<"CustomRequest"> | string | null
     adminQuoteNotes?: StringNullableFilter<"CustomRequest"> | string | null
@@ -1982,7 +2009,7 @@ export namespace Prisma {
     description?: StringWithAggregatesFilter<"CustomRequest"> | string
     referenceImages?: JsonWithAggregatesFilter<"CustomRequest">
     budgetRange?: StringWithAggregatesFilter<"CustomRequest"> | string
-    status?: StringWithAggregatesFilter<"CustomRequest"> | string
+    status?: EnumRequestStatusWithAggregatesFilter<"CustomRequest"> | $Enums.RequestStatus
     adminQuotePrice?: FloatNullableWithAggregatesFilter<"CustomRequest"> | number | null
     adminQuoteEta?: StringNullableWithAggregatesFilter<"CustomRequest"> | string | null
     adminQuoteNotes?: StringNullableWithAggregatesFilter<"CustomRequest"> | string | null
@@ -1996,9 +2023,9 @@ export namespace Prisma {
     userId: string
     productCategory: string
     description: string
-    referenceImages?: JsonNullValueInput | InputJsonValue
+    referenceImages: JsonNullValueInput | InputJsonValue
     budgetRange: string
-    status?: string
+    status?: $Enums.RequestStatus
     adminQuotePrice?: number | null
     adminQuoteEta?: string | null
     adminQuoteNotes?: string | null
@@ -2012,9 +2039,9 @@ export namespace Prisma {
     userId: string
     productCategory: string
     description: string
-    referenceImages?: JsonNullValueInput | InputJsonValue
+    referenceImages: JsonNullValueInput | InputJsonValue
     budgetRange: string
-    status?: string
+    status?: $Enums.RequestStatus
     adminQuotePrice?: number | null
     adminQuoteEta?: string | null
     adminQuoteNotes?: string | null
@@ -2030,7 +2057,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     referenceImages?: JsonNullValueInput | InputJsonValue
     budgetRange?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     adminQuotePrice?: NullableFloatFieldUpdateOperationsInput | number | null
     adminQuoteEta?: NullableStringFieldUpdateOperationsInput | string | null
     adminQuoteNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -2046,7 +2073,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     referenceImages?: JsonNullValueInput | InputJsonValue
     budgetRange?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     adminQuotePrice?: NullableFloatFieldUpdateOperationsInput | number | null
     adminQuoteEta?: NullableStringFieldUpdateOperationsInput | string | null
     adminQuoteNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -2060,9 +2087,9 @@ export namespace Prisma {
     userId: string
     productCategory: string
     description: string
-    referenceImages?: JsonNullValueInput | InputJsonValue
+    referenceImages: JsonNullValueInput | InputJsonValue
     budgetRange: string
-    status?: string
+    status?: $Enums.RequestStatus
     adminQuotePrice?: number | null
     adminQuoteEta?: string | null
     adminQuoteNotes?: string | null
@@ -2078,7 +2105,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     referenceImages?: JsonNullValueInput | InputJsonValue
     budgetRange?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     adminQuotePrice?: NullableFloatFieldUpdateOperationsInput | number | null
     adminQuoteEta?: NullableStringFieldUpdateOperationsInput | string | null
     adminQuoteNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -2094,7 +2121,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     referenceImages?: JsonNullValueInput | InputJsonValue
     budgetRange?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     adminQuotePrice?: NullableFloatFieldUpdateOperationsInput | number | null
     adminQuoteEta?: NullableStringFieldUpdateOperationsInput | string | null
     adminQuoteNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -2137,6 +2164,13 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type EnumRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RequestStatus[]
+    notIn?: $Enums.RequestStatus[]
+    not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
   }
 
   export type FloatNullableFilter<$PrismaModel = never> = {
@@ -2276,6 +2310,16 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
+  export type EnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RequestStatus[]
+    notIn?: $Enums.RequestStatus[]
+    not?: NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumRequestStatusFilter<$PrismaModel>
+  }
+
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -2327,6 +2371,10 @@ export namespace Prisma {
     set?: string
   }
 
+  export type EnumRequestStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RequestStatus
+  }
+
   export type NullableFloatFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -2355,6 +2403,13 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type NestedEnumRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RequestStatus[]
+    notIn?: $Enums.RequestStatus[]
+    not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
   }
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
@@ -2441,6 +2496,16 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RequestStatus[]
+    notIn?: $Enums.RequestStatus[]
+    not?: NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumRequestStatusFilter<$PrismaModel>
   }
 
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {

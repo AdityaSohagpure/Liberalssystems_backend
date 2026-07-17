@@ -2,13 +2,22 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "commonjs",
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
     "resolveJsonModule": true
-  }
+  },
+  "files": [],
+  "references": [
+    { "path": "./services/gateway" },
+    { "path": "./services/custom-request" },
+    { "path": "./services/catalog-service" },
+    { "path": "./services/order-service" },
+    { "path": "./services/payment-service" },
+    { "path": "./services/user-service" }
+  ]
 }

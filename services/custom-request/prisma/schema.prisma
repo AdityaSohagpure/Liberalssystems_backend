@@ -8,22 +8,30 @@ generator client {
   output   = "../src/generated/client"
 }
 
+enum RequestStatus {
+  pending
+  quoted
+  approved
+  rejected
+  converted
+}
+
 model CustomRequest {
-  id              String   @id @default(uuid())
+  id              String        @id @default(uuid())
   userId          String
   productCategory String
-  description     String
-  referenceImages Json     @default("[]") // Array of image URLs
+  description     String        @db.Text
+  referenceImages Json
   budgetRange     String
-  status          String   @default("pending") // "pending" | "quoted" | "approved" | "rejected" | "converted"
+  status          RequestStatus @default(pending)
   
   // Admin Quote fields (nullable until quoted)
   adminQuotePrice Float?
   adminQuoteEta   String?
-  adminQuoteNotes String?
+  adminQuoteNotes String?       @db.Text
 
-  convertedOrderId String? // Set after status becomes "converted"
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  convertedOrderId String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
