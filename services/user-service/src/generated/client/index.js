@@ -153,7 +153,6 @@ const config = {
     },
     "output": {
       "value": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\user-service\\src\\generated\\client",
-      "value": "D:\\Liberal\\services\\user-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -168,7 +167,6 @@ const config = {
     ],
     "previewFeatures": [],
     "sourceFilePath": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\user-service\\prisma\\schema.prisma",
-    "sourceFilePath": "D:\\Liberal\\services\\user-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -193,8 +191,6 @@ const config = {
   },
   "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel User {\n  id          String    @id @default(uuid())\n  firebaseUid String    @unique\n  name        String\n  email       String\n  phone       String?\n  role        String    @default(\"customer\")\n  isActive    Boolean   @default(true)\n  wishlist    Json // Stored as JSON array of product IDs\n  addresses   Address[]\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Address {\n  id         String   @id @default(uuid())\n  userId     String\n  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  street     String\n  city       String\n  state      String\n  country    String\n  postalCode String\n  isDefault  Boolean  @default(false)\n  createdAt  DateTime @default(now())\n}\n",
   "inlineSchemaHash": "f21e767e437d36ab6c4d1d41be8fc15857085cc3d4d26434bc2d31443052b731",
-  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel User {\n  id          String    @id @default(uuid())\n  firebaseUid String    @unique\n  name        String\n  email       String\n  phone       String?\n  role        String    @default(\"customer\") // \"customer\", \"admin\", \"vendor\"\n  wishlist    Json      @default(\"[]\") // JSON array of product IDs\n  addresses   Address[]\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Address {\n  id         String   @id @default(uuid())\n  userId     String\n  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  street     String\n  city       String\n  state      String\n  country    String\n  postalCode String\n  isDefault  Boolean  @default(false)\n  createdAt  DateTime @default(now())\n}\n",
-  "inlineSchemaHash": "55a6e7a48e3d7c9a6b3c127c0e4b9b7a5248e88e1cc6800c6623642d9815b736",
   "copyEngine": true
 }
 

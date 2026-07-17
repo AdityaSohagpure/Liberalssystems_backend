@@ -148,8 +148,6 @@ const config = {
     },
     "output": {
       "value": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\custom-request\\src\\generated\\client",
-      "value": "C:\\Libral_costom\\services\\custom-request\\src\\generated\\client",
-      "value": "D:\\Liberal\\services\\custom-request\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -168,13 +166,6 @@ const config = {
   },
   "relativeEnvPaths": {
     "rootEnvPath": null
-    "sourceFilePath": "C:\\Libral_costom\\services\\custom-request\\prisma\\schema.prisma",
-    "sourceFilePath": "D:\\Liberal\\services\\custom-request\\prisma\\schema.prisma",
-    "isCustomOutput": true
-  },
-  "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",
@@ -183,6 +174,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -193,8 +185,6 @@ const config = {
   },
   "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nenum RequestStatus {\n  pending\n  quoted\n  approved\n  rejected\n  converted\n}\n\nmodel CustomRequest {\n  id              String        @id @default(uuid())\n  userId          String\n  productCategory String\n  description     String        @db.Text\n  referenceImages Json\n  budgetRange     String\n  status          RequestStatus @default(pending)\n\n  // Admin Quote fields (nullable until quoted)\n  adminQuotePrice Float?\n  adminQuoteEta   String?\n  adminQuoteNotes String? @db.Text\n\n  convertedOrderId String?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
   "inlineSchemaHash": "4bfef5aca3188a178d6eb5aee11d3793c5f7ef2fbc3937f8590c5f64cdf73585",
-  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel CustomRequest {\n  id              String @id @default(uuid())\n  userId          String\n  productCategory String\n  description     String\n  referenceImages Json   @default(\"[]\") // Array of image URLs\n  budgetRange     String\n  status          String @default(\"pending\") // \"pending\" | \"quoted\" | \"approved\" | \"rejected\" | \"converted\"\n\n  // Admin Quote fields (nullable until quoted)\n  adminQuotePrice Float?\n  adminQuoteEta   String?\n  adminQuoteNotes String?\n\n  convertedOrderId String? // Set after status becomes \"converted\"\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "b7924c956c1e342994206c0302a8cc9eaf94511999c27c84831dcbd3ee5cb592",
   "copyEngine": true
 }
 config.dirname = '/'

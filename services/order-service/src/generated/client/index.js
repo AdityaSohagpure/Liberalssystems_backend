@@ -178,7 +178,6 @@ const config = {
     },
     "output": {
       "value": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\order-service\\src\\generated\\client",
-      "value": "D:\\Liberal\\services\\order-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -197,12 +196,6 @@ const config = {
   },
   "relativeEnvPaths": {
     "rootEnvPath": null
-    "sourceFilePath": "D:\\Liberal\\services\\order-service\\prisma\\schema.prisma",
-    "isCustomOutput": true
-  },
-  "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
   "clientVersion": "5.22.0",
@@ -211,6 +204,7 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
