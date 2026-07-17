@@ -107,11 +107,6 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 
 exports.Prisma.ModelName = {
   Payment: 'Payment'
@@ -127,7 +122,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\wp\\project\\librals\\backend\\services\\payment-service\\src\\generated\\client",
+      "value": "D:\\Liberal\\services\\payment-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -141,11 +136,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\wp\\project\\librals\\backend\\services\\payment-service\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Liberal\\services\\payment-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -154,8 +149,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
-  "postinstall": false,
+  "activeProvider": "mysql",
   "inlineDatasources": {
     "db": {
       "url": {
@@ -164,8 +158,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel Payment {\n  id         String   @id @default(uuid())\n  orderId    String\n  amount     Float\n  type       String // \"payment\" | \"deposit\" | \"refund\"\n  gatewayRef String // Reference from Stripe/Razorpay\n  status     String // \"pending\" | \"success\" | \"failed\"\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "5305ea24b6c4ebf06c6032ba4bf80e8e700ed4afb7ca23fa4a800b2f3774458d",
+  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel Payment {\n  id         String   @id @default(uuid())\n  orderId    String\n  amount     Float\n  type       String // \"payment\" | \"deposit\" | \"refund\"\n  gatewayRef String // Reference from Stripe/Razorpay\n  status     String // \"pending\" | \"success\" | \"failed\"\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "8abe3900af94f5244c7981de05eade037832a089237b6602af71d54e4904d728",
   "copyEngine": true
 }
 

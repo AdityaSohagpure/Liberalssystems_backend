@@ -123,11 +123,6 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
@@ -155,7 +150,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\wp\\project\\librals\\backend\\services\\user-service\\src\\generated\\client",
+      "value": "D:\\Liberal\\services\\user-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -169,11 +164,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\wp\\project\\librals\\backend\\services\\user-service\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Liberal\\services\\user-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -182,8 +177,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
-  "postinstall": false,
+  "activeProvider": "mysql",
   "inlineDatasources": {
     "db": {
       "url": {
@@ -192,8 +186,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel User {\n  id          String    @id @default(uuid())\n  firebaseUid String    @unique\n  name        String\n  email       String\n  phone       String?\n  role        String    @default(\"customer\") // \"customer\", \"admin\", \"vendor\"\n  wishlist    Json      @default(\"[]\") // JSON array of product IDs\n  addresses   Address[]\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Address {\n  id         String   @id @default(uuid())\n  userId     String\n  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  street     String\n  city       String\n  state      String\n  country    String\n  postalCode String\n  isDefault  Boolean  @default(false)\n  createdAt  DateTime @default(now())\n}\n",
-  "inlineSchemaHash": "e3b7ac9ee902ecfd65c928550af060ed90183e324e20e8560697d8aca7282e39",
+  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel User {\n  id          String    @id @default(uuid())\n  firebaseUid String    @unique\n  name        String\n  email       String\n  phone       String?\n  role        String    @default(\"customer\") // \"customer\", \"admin\", \"vendor\"\n  wishlist    Json      @default(\"[]\") // JSON array of product IDs\n  addresses   Address[]\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Address {\n  id         String   @id @default(uuid())\n  userId     String\n  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  street     String\n  city       String\n  state      String\n  country    String\n  postalCode String\n  isDefault  Boolean  @default(false)\n  createdAt  DateTime @default(now())\n}\n",
+  "inlineSchemaHash": "55a6e7a48e3d7c9a6b3c127c0e4b9b7a5248e88e1cc6800c6623642d9815b736",
   "copyEngine": true
 }
 config.dirname = '/'

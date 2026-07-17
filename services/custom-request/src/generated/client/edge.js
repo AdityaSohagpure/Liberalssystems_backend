@@ -115,11 +115,6 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
@@ -146,7 +141,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\wp\\project\\librals\\backend\\services\\custom-request\\src\\generated\\client",
+      "value": "D:\\Liberal\\services\\custom-request\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -160,11 +155,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\wp\\project\\librals\\backend\\services\\custom-request\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Liberal\\services\\custom-request\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -173,8 +168,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
-  "postinstall": false,
+  "activeProvider": "mysql",
   "inlineDatasources": {
     "db": {
       "url": {
@@ -183,8 +177,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel CustomRequest {\n  id              String @id @default(uuid())\n  userId          String\n  productCategory String\n  description     String\n  referenceImages Json   @default(\"[]\") // Array of image URLs\n  budgetRange     String\n  status          String @default(\"pending\") // \"pending\" | \"quoted\" | \"approved\" | \"rejected\" | \"converted\"\n\n  // Admin Quote fields (nullable until quoted)\n  adminQuotePrice Float?\n  adminQuoteEta   String?\n  adminQuoteNotes String?\n\n  convertedOrderId String? // Set after status becomes \"converted\"\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "fe6ed4cfce3926c51926f3a0a63a97363023333ede3beb6a9741550dfe0ff851",
+  "inlineSchema": "datasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/client\"\n}\n\nmodel CustomRequest {\n  id              String @id @default(uuid())\n  userId          String\n  productCategory String\n  description     String\n  referenceImages Json   @default(\"[]\") // Array of image URLs\n  budgetRange     String\n  status          String @default(\"pending\") // \"pending\" | \"quoted\" | \"approved\" | \"rejected\" | \"converted\"\n\n  // Admin Quote fields (nullable until quoted)\n  adminQuotePrice Float?\n  adminQuoteEta   String?\n  adminQuoteNotes String?\n\n  convertedOrderId String? // Set after status becomes \"converted\"\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "b7924c956c1e342994206c0302a8cc9eaf94511999c27c84831dcbd3ee5cb592",
   "copyEngine": true
 }
 config.dirname = '/'

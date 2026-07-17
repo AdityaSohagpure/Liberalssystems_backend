@@ -31,10 +31,11 @@ const services = {
 // Apply token verification middleware
 app.use(authenticateToken);
 
-// Create proxy options that forwards the custom headers
-const createProxyOpts = (target: string): Options => ({
+// Create proxy options that forwards the custom headers and appends path prefix
+const createProxyOpts = (target: string, pathPrefix: string): Options => ({
   target,
   changeOrigin: true,
+  pathRewrite: (path) => pathPrefix + path,
   on: {
     proxyReq: (proxyReq, req: any) => {
       // Forward authentication headers from gateway to downstream services
@@ -51,12 +52,37 @@ const createProxyOpts = (target: string): Options => ({
   }
 });
 
+// Specific route for Product Availability (handled by Order Service)
+app.use(createProxyMiddleware({
+  target: services.order,
+  changeOrigin: true,
+  pathFilter: (path) => /^\/api\/products\/[^\/]+\/availability$/.test(path),
+  pathRewrite: (path) => {
+    const match = path.match(/^\/api\/products\/([^\/]+)\/availability$/);
+    return match ? `/orders/products/${match[1]}/availability` : path;
+  },
+  on: {
+    proxyReq: (proxyReq, req: any) => {
+      if (req.headers['x-user-id']) {
+        proxyReq.setHeader('x-user-id', req.headers['x-user-id'] as string);
+      }
+      if (req.headers['x-user-role']) {
+        proxyReq.setHeader('x-user-role', req.headers['x-user-role'] as string);
+      }
+      if (req.headers['x-user-firebase-uid']) {
+        proxyReq.setHeader('x-user-firebase-uid', req.headers['x-user-firebase-uid'] as string);
+      }
+    }
+  }
+}));
+
 // Route mapping
-app.use('/api/users', createProxyMiddleware(createProxyOpts(services.user)));
-app.use('/api/products', createProxyMiddleware(createProxyOpts(services.catalog)));
-app.use('/api/orders', createProxyMiddleware(createProxyOpts(services.order)));
-app.use('/api/payments', createProxyMiddleware(createProxyOpts(services.payment)));
-app.use('/api/custom-requests', createProxyMiddleware(createProxyOpts(services.customRequest)));
+app.use('/api/users', createProxyMiddleware(createProxyOpts(services.user, '/users')));
+app.use('/api/products', createProxyMiddleware(createProxyOpts(services.catalog, '/products')));
+app.use('/api/cart', createProxyMiddleware(createProxyOpts(services.order, '/orders/cart')));
+app.use('/api/orders', createProxyMiddleware(createProxyOpts(services.order, '/orders')));
+app.use('/api/payments', createProxyMiddleware(createProxyOpts(services.payment, '/payments')));
+app.use('/api/custom-requests', createProxyMiddleware(createProxyOpts(services.customRequest, '/custom-requests')));
 
 // Fallback route
 app.use((req, res) => {
