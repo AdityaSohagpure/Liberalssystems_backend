@@ -144,7 +144,6 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\catalog-service\\src\\generated\\client",
       "value": "D:\\Liberal\\services\\catalog-service\\src\\generated\\client",
       "fromEnvVar": null
     },
@@ -159,11 +158,6 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\yashf\\Documents\\Liberalbackend\\services\\catalog-service\\prisma\\schema.prisma",
-    "isCustomOutput": true
-  },
-  "relativeEnvPaths": {
-    "rootEnvPath": null
     "sourceFilePath": "D:\\Liberal\\services\\catalog-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
