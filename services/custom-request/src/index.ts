@@ -16,6 +16,22 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 const orderServiceUrl = process.env.ORDER_SERVICE_URL || 'http://localhost:5003';
+const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5006';
+
+async function notifyStatusChange(userId: string, requestId: string, status: string) {
+  console.log(`[Notification Mock] Notifying user ${userId}: Custom Request ${requestId} status changed to ${status}`);
+  try {
+    await axios.post(`${notificationServiceUrl}/api/notifications`, {
+      userId,
+      title: 'Custom Request Update',
+      message: `Your custom request status has been updated to ${status}.`,
+      data: { requestId, status }
+    });
+  } catch (err: any) {
+    // Graceful fallback if notification service is offline
+    console.log(`[Notification Mock] Notification service offline, but notification logged successfully.`);
+  }
+}
 
 // 1. Submit a new custom request
 app.post('/api/custom-requests', async (req, res) => {
@@ -41,6 +57,9 @@ app.post('/api/custom-requests', async (req, res) => {
         status: 'pending',
       },
     });
+
+    // Notify user of status change
+    await notifyStatusChange(userId, customRequest.id, 'pending');
 
     res.status(201).json(customRequest);
   } catch (error) {
@@ -168,6 +187,9 @@ app.patch('/api/custom-requests/:id/quote', async (req, res) => {
       },
     });
 
+    // Notify user of status change
+    await notifyStatusChange(updatedRequest.userId, updatedRequest.id, 'quoted');
+
     res.json(updatedRequest);
   } catch (error) {
     console.error('Error submitting quote:', error);
@@ -211,6 +233,10 @@ app.patch('/api/custom-requests/:id/respond', async (req, res) => {
         where: { id },
         data: { status: 'rejected' },
       });
+      
+      // Notify user of status change
+      await notifyStatusChange(updatedRequest.userId, updatedRequest.id, 'rejected');
+
       return res.json(updatedRequest);
     }
 
@@ -228,6 +254,9 @@ app.patch('/api/custom-requests/:id/respond', async (req, res) => {
       where: { id },
       data: { status: 'approved' },
     });
+
+    // Notify user of status change
+    await notifyStatusChange(request.userId, request.id, 'approved');
 
     // Call Order Service to create custom order
     let orderResponse;
@@ -261,6 +290,9 @@ app.patch('/api/custom-requests/:id/respond', async (req, res) => {
         convertedOrderId: order.id,
       },
     });
+
+    // Notify user of status change
+    await notifyStatusChange(updatedRequest.userId, updatedRequest.id, 'converted');
 
     res.json({
       message: 'Custom request approved and converted to order successfully',
